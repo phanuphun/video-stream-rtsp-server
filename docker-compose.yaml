@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx
+    restart: unless-stopped
+    ports:
+      - "8554:8554"    # RTSP (TCP)
+      - "8000:8000/udp"   # RTP (UDP)
+      - "8001:8001/udp"   # RTCP (UDP)
+      - "1935:1935"    # RTMP (TCP)
+      - "8888:8888"    # HTTP (HLS/WebRTC) (TCP)
+    volumes:
+      - ./config/mediamtx.yml:/mediamtx.yml:ro
+    environment:
+      - TZ=Asia/Bangkok
+    networks:
+      - mediamtx_network
+
+  publisher-ffmpeg:
+    build: .
+    container_name: publisher_ffmpeg
+    restart: unless-stopped
+    environment:
+      - RTSP_SERVER=rtsp://mediamtx:8554/cam1
+      - TZ=Asia/Bangkok
+    depends_on:
+      - mediamtx
+    networks:
+      - mediamtx_network
+
+networks:
+  mediamtx_network:
+    driver: bridge
+  

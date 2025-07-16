@@ -1,0 +1,5 @@
+protocols: [ udp, tcp ]
+
+paths:
+  cam1:
+    source: publisher
